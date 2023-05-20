@@ -1,4 +1,5 @@
 import { PrismaClient, Review } from "@prisma/client";
+import { notFound } from "next/navigation";
 import Description from "./components/Description";
 import Images from "./components/Images";
 import Rating from "./components/Rating";
@@ -15,7 +16,7 @@ interface Restaurant {
   images: string[];
   description: string;
   slug: string;
-  reviews: Review[]
+  reviews: Review[];
 }
 
 const fetchRestaurantBySlug = async (slug: string): Promise<Restaurant> => {
@@ -30,11 +31,11 @@ const fetchRestaurantBySlug = async (slug: string): Promise<Restaurant> => {
       description: true,
       slug: true,
       reviews: true,
-    }
+    },
   });
 
-  if(!restaurant) {
-    throw new Error;
+  if (!restaurant) {
+    notFound()
   }
 
   return restaurant;
