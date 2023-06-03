@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 
@@ -11,7 +12,6 @@ export default async function handler(
   const bearerToken = req.headers["authorization"] as string;
   const token = bearerToken.split(" ")[1];
 
-  // just using the jsonwebtoken package to decode
   const payload = jwt.decode(token) as { email: string };
 
   if (!payload.email) {
@@ -34,5 +34,17 @@ export default async function handler(
     },
   });
 
-  return res.json({ user });
+  if (!user) {
+    return res.status(401).json({
+      errorMessage: "User not found",
+    });
+  }
+
+  return res.json({
+    id: user.id,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    phone: user.phone,
+    city: user.city,
+  });
 }
