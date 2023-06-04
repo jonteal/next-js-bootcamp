@@ -1,11 +1,10 @@
 import axios from "axios";
+import { getCookie, removeCookies } from "cookies-next";
 import { useContext } from "react";
 import { AuthenticationContext } from "../app/context/AuthContext";
 
 const useAuth = () => {
-  const { data, error, loading, setAuthState } = useContext(
-    AuthenticationContext
-  );
+  const { setAuthState } = useContext(AuthenticationContext);
 
   const signin = async (
     {
@@ -22,7 +21,6 @@ const useAuth = () => {
       error: null,
       loading: true,
     });
-
     try {
       const response = await axios.post(
         "http://localhost:3000/api/auth/signin",
@@ -41,7 +39,7 @@ const useAuth = () => {
       setAuthState({
         data: null,
         error: error.response.data.errorMessage,
-        loading: true,
+        loading: false,
       });
     }
   };
@@ -68,7 +66,6 @@ const useAuth = () => {
       error: null,
       loading: true,
     });
-
     try {
       const response = await axios.post(
         "http://localhost:3000/api/auth/signup",
@@ -78,7 +75,7 @@ const useAuth = () => {
           firstName,
           lastName,
           city,
-          phone
+          phone,
         }
       );
       setAuthState({
@@ -91,14 +88,25 @@ const useAuth = () => {
       setAuthState({
         data: null,
         error: error.response.data.errorMessage,
-        loading: true,
+        loading: false,
       });
     }
+  };
+
+  const signout = () => {
+    removeCookies("jwt");
+
+    setAuthState({
+      data: null,
+      error: null,
+      loading: false,
+    });
   };
 
   return {
     signin,
     signup,
+    signout,
   };
 };
 

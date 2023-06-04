@@ -13,7 +13,6 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const { firstName, lastName, email, phone, city, password } = req.body;
-
     const errors: string[] = [];
 
     const validationSchema = [
@@ -29,7 +28,7 @@ export default async function handler(
           min: 1,
           max: 20,
         }),
-        errorMessage: "Last name is invalid",
+        errorMessage: "First name is invalid",
       },
       {
         valid: validator.isEmail(email),
@@ -37,17 +36,15 @@ export default async function handler(
       },
       {
         valid: validator.isMobilePhone(phone),
-        errorMessage: "Phone is invalid",
+        errorMessage: "Phone number is invalid",
       },
       {
-        valid: validator.isLength(city, {
-          min: 1,
-        }),
+        valid: validator.isLength(city, { min: 1 }),
         errorMessage: "City is invalid",
       },
       {
         valid: validator.isStrongPassword(password),
-        errorMessage: "Password is invalid",
+        errorMessage: "Password is not strong enough",
       },
     ];
 
@@ -68,9 +65,9 @@ export default async function handler(
     });
 
     if (userWithEmail) {
-      return res.status(400).json({
-        errorMessage: "Email already associated with another account",
-      });
+      return res
+        .status(400)
+        .json({ errorMessage: "Email is associated with another account" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -105,5 +102,6 @@ export default async function handler(
       city: user.city,
     });
   }
-  return res.status(400).json("Unknown endpoint");
+
+  return res.status(404).json("Unknown endpoint");
 }
